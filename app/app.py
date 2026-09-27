@@ -4,6 +4,7 @@ from flask import Flask, render_template_string, request
 base_dir = os.path.dirname(os.path.abspath(__file__))
 html_file_path = os.path.join(base_dir, 'index.html')
 
+# Render busca obligatoriamente esta palabra 'app' exacta y en minúsculas
 app = Flask(__name__)
 
 @app.route('/')
@@ -13,7 +14,7 @@ def home():
             html_content = f.read()
         return render_template_string(html_content)
     except FileNotFoundError:
-        return "<h1>Error: No se encuentra index.html en la carpeta principal.</h1>", 404
+        return "<h1>Error: No se encuentra index.html en el servidor.</h1>", 404
 
 @app.route('/enviar', methods=['POST'])
 def recibir_mensaje():
@@ -24,32 +25,23 @@ def recibir_mensaje():
     urgencia = request.form.get('urgencia')
     texto_falla = request.form.get('falla')
     
-    # Esto se imprimirá en los Logs de Render en tiempo real
-    print("\n" + "╔" + "═"*45 + "╗")
-    if tipo_usuario == 'Profesor':
-        print(f"║ [SERVIDOR] ¡NUEVO REPORTE DE PROFESOR!      ║")
-        print(f"╠" + "═"*45 + "╣")
-        print(f"• Nombre del Profesor: {usuario}")
-        print(f"• Número de Empleado:  {identificacion}")
-    else:
-        print(f"║ [SERVIDOR] ¡NUEVO REPORTE DE ALUMNO!        ║")
-        print(f"╠" + "═"*45 + "╣")
-        print(f"• Nombre del Alumno:   {usuario}")
-        print(f"• Número de Boleta:    {identificacion}")
-        
-    print(f"• Ubicación:           {ubicacion}")
-    print(f"• Urgencia:            {urgencia}")
-    print(f"• Detalle de falla:    {texto_falla}")
-    print("╚" + "═"*45 + "╝\n")
+    print("\n" + "="*45)
+    print(f"[SERVIDOR] ¡NUEVO REPORTE DE {str(tipo_usuario).upper()}!")
+    print(f"• Nombre:        {usuario}")
+    print(f"• Identificación:{identificacion}")
+    print(f"• Ubicación:     {ubicacion}")
+    print(f"• Urgencia:      {urgencia}")
+    print(f"• Falla:         {texto_falla}")
+    print("="*45 + "\n")
     
     return f"""
     <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
         <h1 style="color: #673ab7;">¡Muchas gracias, {usuario}!</h1>
-        <p style="font-size: 18px;">Tu reporte como <strong>{tipo_usuario}</strong> ha sido recibido con éxito.</p>
+        <p style="font-size: 18px;">Tu reporte como <strong>{tipo_usuario}</strong> ha sido recibido con éxito en el sistema.</p>
         <a href="/" style="color: #512da8; text-decoration: none; font-weight: bold;">← Enviar otro reporte</a>
     </div>
     """
 
 if __name__ == '__main__':
-    # Configuración local de pruebas
     app.run(debug=True, port=8080)
+
